@@ -4,6 +4,9 @@ use rand::seq::SliceRandom;
 use strum::EnumCount;
 use strum_macros::{EnumCount, FromRepr};
 
+mod constants;
+use constants::G_ASCII;
+
 
 const NOTES: [&'static str; 7] = ["A", "B", "C", "D", "E", "F", "G"];
 const ITALIAN_NOTES : [&'static str; 7] = ["La", "Si", "Do", "Re", "Mi", "Fa", "Sol"];
@@ -44,6 +47,56 @@ impl MajorScale {
     }
 }
 
+
+#[derive(FromRepr, Debug, PartialEq, EnumCount)]
+enum Note {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+}
+
+impl Note {
+    fn get_ascii(&self) -> &'static str {
+        match self {
+            Note::A => "A",
+            Note::B => "B",
+            Note::C => "C",
+            Note::D => "D",
+            Note::E => "E",
+            Note::F => "F",
+            Note::G => G_ASCII,
+        }
+    }
+
+    fn code_to_note(code: &str) -> Note {
+        match code {
+            "A" => Note::A,
+            "B" => Note::B,
+            "C" => Note::C,
+            "D" => Note::D,
+            "E" => Note::E,
+            "F" => Note::F,
+            "G" => Note::G,
+            _ => panic!("invalid note code"),
+        }
+    }
+
+    fn note_to_code(&self) -> &'static str {
+        match self {
+            Note::A => "A",
+            Note::B => "B",
+            Note::C => "C",
+            Note::D => "D",
+            Note::E => "E",
+            Note::F => "F",
+            Note::G => "G",
+        }
+    }
+}
 
 fn get_note_index(note: &str) -> Option<usize> {
     for (i, n) in NOTES.iter().enumerate() {
@@ -108,8 +161,21 @@ fn american_to_italian_notes_test() {
     notes_to_italian_test(american_note);
 }
 
+fn sheet_note_test() {
+    // let rand_usize = random_usize(0, MajorScale::COUNT);
+    let note: Note = Note::from_repr(6).unwrap();
+    print!("what note is this? {}\n", note.get_ascii());
+    let answer = read_from_user().expect("failed to read from user");
+    if Note::code_to_note(&answer.trim()) == note {
+        println!("correct!");
+    }
+    else {
+        println!("incorrect! next note was {}", note.note_to_code());
+    }
+}
 
 fn main() {
+    sheet_note_test();
     circle_of_fifths_test();
     american_to_italian_notes_test();
 }
