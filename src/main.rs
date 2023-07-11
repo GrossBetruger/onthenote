@@ -6,6 +6,7 @@ use strum_macros::{EnumCount, FromRepr};
 
 mod constants;
 use constants::G_ASCII;
+use crate::constants::{A_ASCII, B_ASCII, C_ASCII, D_ASCII, E_ASCII, F_ASCII};
 
 
 const NOTES: [&'static str; 7] = ["A", "B", "C", "D", "E", "F", "G"];
@@ -60,14 +61,14 @@ enum Note {
 }
 
 impl Note {
-    fn get_ascii(&self) -> &'static str {
+    fn get_ascii_art(&self) -> &'static str {
         match self {
-            Note::A => "A",
-            Note::B => "B",
-            Note::C => "C",
-            Note::D => "D",
-            Note::E => "E",
-            Note::F => "F",
+            Note::A => A_ASCII,
+            Note::B => B_ASCII,
+            Note::C => C_ASCII,
+            Note::D => D_ASCII,
+            Note::E => E_ASCII,
+            Note::F => F_ASCII,
             Note::G => G_ASCII,
         }
     }
@@ -117,8 +118,7 @@ fn read_from_user() -> Option<String> {
 
 fn notes_to_italian_test(note: &str) -> Option<&'static str> {
     println!("what is the italian name for: {}", note);
-    let mut user_input = read_from_user()?;
-    // stdin().read_line(&mut user_input).ok()?;
+    let ref mut user_input = read_from_user()?;
 
     let index = get_note_index(note)?;
     let italian = ITALIAN_NOTES[index];
@@ -145,6 +145,10 @@ fn circle_of_fifths_test() {
     println!("what are the notes of major scale: {:?}", scale);
     for note in scale_notes.iter() {
         let answer = read_from_user().expect("failed to read from user");
+        if answer.is_empty() {
+            println!("skipping note...");
+            continue;
+        }
         if note.to_ascii_lowercase().starts_with(&answer.to_ascii_lowercase().trim()) {
             println!("correct!");
         }
@@ -161,12 +165,13 @@ fn american_to_italian_notes_test() {
     notes_to_italian_test(american_note);
 }
 
+
 fn sheet_note_test() {
-    // let rand_usize = random_usize(0, MajorScale::COUNT);
-    let note: Note = Note::from_repr(6).unwrap();
-    print!("what note is this? {}\n", note.get_ascii());
+    let rand_usize = random_usize(0, MajorScale::COUNT);
+    let note: Note = Note::from_repr(rand_usize).unwrap();
+    print!("what note is this? {}\n", note.get_ascii_art());
     let answer = read_from_user().expect("failed to read from user");
-    if Note::code_to_note(&answer.trim()) == note {
+    if Note::code_to_note(&answer.trim().to_uppercase()) == note {
         println!("correct!");
     }
     else {
@@ -174,9 +179,27 @@ fn sheet_note_test() {
     }
 }
 
+fn choose_game() {
+    println!("\nchoose a game:\n");
+    println!("1. sheet note");
+    println!("2. circle of fifths");
+    println!("3. american to italian notes");
+    println!();
+    let ref mut user_input = String::new();
+    stdin().read_line(user_input).expect("failed to read input");
+    let game = user_input.trim().parse::<u8>().unwrap();
+    match game {
+        1 => sheet_note_test(),
+        2 => circle_of_fifths_test(),
+        3 => american_to_italian_notes_test(),
+        _ => println!("invalid game"),
+    }
+}
+
+
 fn main() {
-    sheet_note_test();
-    circle_of_fifths_test();
-    american_to_italian_notes_test();
+    loop {
+        choose_game();
+    }
 }
 
