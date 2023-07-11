@@ -116,11 +116,11 @@ fn read_from_user() -> Option<String> {
 }
 
 
-fn notes_to_italian_test(note: &str) -> Option<&'static str> {
+fn notes_to_italian_test(note: &str) {
     println!("what is the italian name for: {}", note);
-    let ref mut user_input = read_from_user()?;
+    let ref mut user_input = read_from_user().expect("failed to read from user");
 
-    let index = get_note_index(note)?;
+    let index = get_note_index(note).expect(format!("invalid note, {}", note).as_str());
     let italian = ITALIAN_NOTES[index];
     if user_input.to_ascii_lowercase().starts_with(&italian.to_ascii_lowercase()) {
         println!("correct! {} is {}", note, italian);
@@ -128,7 +128,6 @@ fn notes_to_italian_test(note: &str) -> Option<&'static str> {
     else {
         println!("incorrect! {} is {}", note, italian);
     }
-    None
 }
 
 
@@ -175,7 +174,7 @@ fn sheet_note_test() {
         println!("correct!");
     }
     else {
-        println!("incorrect! next note was {}", note.note_to_code());
+        println!("incorrect! note was {}", note.note_to_code());
     }
 }
 
