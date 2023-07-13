@@ -7,6 +7,7 @@ use strum_macros::{EnumCount, FromRepr};
 mod constants;
 use constants::G_ASCII;
 use crate::constants::{A_ASCII, B_ASCII, C_ASCII, D_ASCII, E_ASCII, F_ASCII};
+use colored::Colorize;
 
 
 const NOTES: [&'static str; 7] = ["A", "B", "C", "D", "E", "F", "G"];
@@ -115,6 +116,14 @@ fn read_from_user() -> Option<String> {
     Some(user_input)
 }
 
+fn correct_output(output: &str) {
+    println!("{}", output.green())
+}
+
+fn incorrect_output(output: &str) {
+    println!("{}", output.red())
+}
+
 
 fn notes_to_italian_test(note: &str) {
     println!("what is the italian name for: {}", note);
@@ -123,10 +132,10 @@ fn notes_to_italian_test(note: &str) {
     let index = get_note_index(note).expect(format!("invalid note, {}", note).as_str());
     let italian = ITALIAN_NOTES[index];
     if user_input.to_ascii_lowercase().starts_with(&italian.to_ascii_lowercase()) {
-        println!("correct! {} is {}", note, italian);
+        correct_output(format!("correct! {} is {}", note, italian).as_str());
     }
     else {
-        println!("incorrect! {} is {}", note, italian);
+        incorrect_output(format!("incorrect! {} is {}", note, italian).as_str());
     }
 }
 
@@ -149,10 +158,10 @@ fn circle_of_fifths_test() {
             continue;
         }
         if note.to_ascii_lowercase().starts_with(&answer.to_ascii_lowercase().trim()) {
-            println!("correct!");
+            correct_output("correct!");
         }
         else {
-            println!("incorrect! next note was {}", note);
+            incorrect_output(format!("incorrect! next note was {}", note).as_str());
             break;
         }
     }
@@ -171,10 +180,10 @@ fn sheet_note_test() {
     print!("what note is this? {}\n", note.get_ascii_art());
     let answer = read_from_user().expect("failed to read from user");
     if Note::code_to_note(&answer.trim().to_uppercase()) == note {
-        println!("correct!");
+        correct_output("correct!");
     }
     else {
-        println!("incorrect! note was {}", note.note_to_code());
+        incorrect_output(format!("incorrect! note was {}", note.note_to_code()).as_str());
     }
 }
 
