@@ -23,6 +23,13 @@ const E_MAJOR_SCALE: [&'static str; 7] = ["E", "F#", "G#", "A", "B", "C#", "D#"]
 const F_MAJOR_SCALE: [&'static str; 7] = ["F", "G", "A", "Bb", "C", "D", "E"];
 const G_MAJOR_SCALE: [&'static str; 7] = ["G", "A", "B", "C", "D", "E", "F#"];
 
+const A_MINOR_SCALE: [&'static str; 7] = ["A", "B", "C", "D", "E", "F", "G"];
+const B_MINOR_SCALE: [&'static str; 7] = ["B", "C#", "D", "E", "F#", "G", "A"];
+const C_MINOR_SCALE: [&'static str; 7] = ["C", "D", "Eb", "F", "G", "Ab", "Bb"];
+const D_MINOR_SCALE: [&'static str; 7] = ["D", "E", "F", "G", "A", "Bb", "C"];
+const E_MINOR_SCALE: [&'static str; 7] = ["E", "F#", "G", "A", "B", "C", "D"];
+const F_MINOR_SCALE: [&'static str; 7] = ["F", "G", "Ab", "Bb", "C", "Db", "Eb"];
+const G_MINOR_SCALE: [&'static str; 7] = ["G", "A", "Bb", "C", "D", "Eb", "F"];
 
 #[derive(FromRepr, Debug, PartialEq, EnumCount)]
 enum MajorScale {
