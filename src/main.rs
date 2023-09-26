@@ -31,6 +31,14 @@ const E_MINOR_SCALE: [&'static str; 7] = ["E", "F#", "G", "A", "B", "C", "D"];
 const F_MINOR_SCALE: [&'static str; 7] = ["F", "G", "Ab", "Bb", "C", "Db", "Eb"];
 const G_MINOR_SCALE: [&'static str; 7] = ["G", "A", "Bb", "C", "D", "Eb", "F"];
 
+const MAJOR_SCALE_INTERVALS: [u8; 7] = [2, 2, 1, 2, 2, 2, 1];
+const MINOR_SCALE_INTERVALS: [u8; 7] = [2, 1, 2, 2, 1, 2, 2];
+
+// circle of fifths trick
+const MAJOR_SCALE_SHARPS: [&'static str; 7] = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"];
+const MAJOR_SCALE_FLATS: [&'static str; 7] = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"];
+
+
 #[derive(FromRepr, Debug, PartialEq, EnumCount)]
 enum MajorScale {
     A,
