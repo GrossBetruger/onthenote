@@ -38,6 +38,16 @@ const MINOR_SCALE_INTERVALS: [u8; 7] = [2, 1, 2, 2, 1, 2, 2];
 const MAJOR_SCALE_SHARPS: [&'static str; 7] = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"];
 const MAJOR_SCALE_FLATS: [&'static str; 7] = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"];
 
+#[derive(FromRepr, Debug, PartialEq, EnumCount)]
+enum ChordFunction {
+    I,
+    II,
+    III,
+    IV,
+    V,
+    VI,
+    VII,
+}
 
 #[derive(FromRepr, Debug, PartialEq, EnumCount)]
 enum MajorScale {
@@ -169,10 +179,10 @@ fn circle_of_fifths_test() {
     for note in scale_notes.iter() {
         let answer = read_from_user().expect("failed to read from user");
         if answer.is_empty() {
-            println!("skipping note...");
+            println!("skipping note..., the answer was {}", note);
             continue;
         }
-        if note.to_ascii_lowercase().starts_with(&answer.to_ascii_lowercase().trim()) {
+        if note.to_ascii_lowercase() == answer.to_ascii_lowercase().trim() {
             correct_output("correct!");
         }
         else {
@@ -202,11 +212,45 @@ fn sheet_note_test() {
     }
 }
 
+fn chord_function_test() {
+    let rand_usize = random_usize(0, MajorScale::COUNT);
+    let scale: MajorScale = MajorScale::from_repr(rand_usize).unwrap();
+    let scale_notes = *scale.get_major_scale();
+    let rand_note = scale_notes.choose(&mut rand::thread_rng()).unwrap();
+    // let random_function = [ChordFunction::I, ChordFunction::II, ChordFunction::III, ChordFunction::IV, ChordFunction::V, ChordFunction::VI, ChordFunction::VII].choose(&mut rand::thread_rng()).unwrap();
+    let function_index = random_usize(0, ChordFunction::COUNT);
+    let root = scale_notes.get(function_index).expect("failed to get root note");
+    let function = ChordFunction::from_repr(function_index).expect("failed to get chord function");
+
+    let chord_type = match function {
+        ChordFunction::I => { "maj7" },
+        ChordFunction::II => { "m7" },
+        ChordFunction::III => { "m7" },
+        ChordFunction::IV => { "maj7" },
+        ChordFunction::V => { "7" },
+        ChordFunction::VI => { "m7" },
+        ChordFunction::VII => { "m7b5" },
+    };
+
+    // concate root and chord type to var chord
+    let chord = format!("{}{}", root, chord_type);
+    println!("what is the {:?} chord of major scale: {:?}", function, scale);
+
+    let answer = read_from_user().expect("failed to read from user");
+    if answer.trim().to_ascii_lowercase() == chord.to_ascii_lowercase() {
+        correct_output("correct!");
+    } else {
+        incorrect_output(format!("incorrect! chord was {}", chord).as_str());
+    }
+}
+
+
 fn choose_game() {
     println!("\nchoose a game:\n");
     println!("1. sheet note");
     println!("2. circle of fifths");
     println!("3. american to italian notes");
+    println!("4. chord function");
     println!();
     let ref mut user_input = String::new();
     stdin().read_line(user_input).expect("failed to read input");
@@ -215,6 +259,7 @@ fn choose_game() {
         1 => sheet_note_test(),
         2 => circle_of_fifths_test(),
         3 => american_to_italian_notes_test(),
+        4 => chord_function_test(),
         _ => println!("invalid game"),
     }
 }
