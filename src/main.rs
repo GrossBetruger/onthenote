@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::io::stdin;
 use rand::distributions::uniform::SampleRange;
 use rand::seq::SliceRandom;
@@ -212,13 +213,15 @@ fn sheet_note_test() {
     }
 }
 
-fn chord_function_test() {
+fn chord_function_test(filter: Vec<usize>) {
     let rand_usize = random_usize(0, MajorScale::COUNT);
     let scale: MajorScale = MajorScale::from_repr(rand_usize).unwrap();
     let scale_notes = *scale.get_major_scale();
-    let rand_note = scale_notes.choose(&mut rand::thread_rng()).unwrap();
     // let random_function = [ChordFunction::I, ChordFunction::II, ChordFunction::III, ChordFunction::IV, ChordFunction::V, ChordFunction::VI, ChordFunction::VII].choose(&mut rand::thread_rng()).unwrap();
     let function_index = random_usize(0, ChordFunction::COUNT);
+    if !filter.contains(&function_index) {
+        return chord_function_test(filter);
+    }
     let root = scale_notes.get(function_index).expect("failed to get root note");
     let function = ChordFunction::from_repr(function_index).expect("failed to get chord function");
 
@@ -232,7 +235,6 @@ fn chord_function_test() {
         ChordFunction::VII => { "m7b5" },
     };
 
-    // concate root and chord type to var chord
     let chord = format!("{}{}", root, chord_type);
     println!("what is the {:?} chord of major scale: {:?}", function, scale);
 
@@ -251,15 +253,18 @@ fn choose_game() {
     println!("2. circle of fifths");
     println!("3. american to italian notes");
     println!("4. chord function");
+    println!("5. chord function IV V");
     println!();
     let ref mut user_input = String::new();
     stdin().read_line(user_input).expect("failed to read input");
-    let game = user_input.trim().parse::<u8>().unwrap();
+    let game = user_input.trim().parse::<u8>().expect(format!("invalid input: '{}'", user_input).as_str());
+    
     match game {
         1 => sheet_note_test(),
         2 => circle_of_fifths_test(),
         3 => american_to_italian_notes_test(),
-        4 => chord_function_test(),
+        4 => chord_function_test(vec![]),
+        5 => chord_function_test(vec![3, 4]),
         _ => println!("invalid game"),
     }
 }
