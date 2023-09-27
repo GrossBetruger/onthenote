@@ -183,6 +183,7 @@ fn notes_to_italian_test(note: &str) {
     let question = format!("what is the italian name for: {}", note);
     let index = get_note_index(note).expect(format!("invalid note, {}", note).as_str());
     let italian = ITALIAN_NOTES[index];
+
     let mut game = Game {
         user_answer: None,
         correct_answer: String::from(italian),
@@ -301,3 +302,47 @@ fn main() {
     }
 }
 
+#[test]
+fn test_get_note_index() {
+    assert_eq!(get_note_index("A"), Some(0));
+    assert_eq!(get_note_index("B"), Some(1));
+    assert_eq!(get_note_index("C"), Some(2));
+    assert_eq!(get_note_index("D"), Some(3));
+    assert_eq!(get_note_index("E"), Some(4));
+    assert_eq!(get_note_index("F"), Some(5));
+    assert_eq!(get_note_index("G"), Some(6));
+    assert_eq!(get_note_index("H"), None);
+}
+
+#[test]
+fn test_notes_to_italian1() {
+    let index = get_note_index("C").unwrap();
+    let italian = ITALIAN_NOTES[index];
+    let game = Game {
+        user_answer: Some(String::from(italian)),
+        correct_answer: String::from("Do"),
+    };
+    assert_eq!(game.check_answer(), true);
+}
+
+#[test]
+fn test_notes_to_italian2() {
+    let index = get_note_index("D").unwrap();
+    let italian = ITALIAN_NOTES[index];
+    let game = Game {
+        user_answer: Some(String::from(italian)),
+        correct_answer: String::from("Re"),
+    };
+    assert_eq!(game.check_answer(), true);
+}
+
+#[test]
+fn test_notes_to_italian3() {
+    let index = get_note_index("G").unwrap();
+    let italian = ITALIAN_NOTES[index];
+    let game = Game {
+        user_answer: Some(String::from(italian)),
+        correct_answer: String::from("sol"),
+    };
+    assert_eq!(game.check_answer(), true);
+}
