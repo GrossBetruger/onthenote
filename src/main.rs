@@ -39,6 +39,34 @@ const MINOR_SCALE_INTERVALS: [u8; 7] = [2, 1, 2, 2, 1, 2, 2];
 const MAJOR_SCALE_SHARPS: [&'static str; 7] = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"];
 const MAJOR_SCALE_FLATS: [&'static str; 7] = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"];
 
+struct Game {
+    user_answer: Option<String>,
+    correct_answer: String,
+}
+
+impl Game {
+    fn check_answer(&self) -> bool {
+        self.user_answer.clone().expect("user answer doesn't exist").trim().to_lowercase() == self.correct_answer.trim().to_lowercase()
+    }
+
+    fn get_user_answer(&mut self) {
+        let mut user_answer = String::new();
+        stdin().read_line(&mut user_answer).expect("Failed to read line");
+        self.user_answer = Some(user_answer);
+    }
+
+    fn play_game(&mut self, question: &str) {
+        println!("{}", question);
+        self.get_user_answer();
+        if self.check_answer() {
+            correct_output("Correct!");
+        } else {
+            incorrect_output((format!("Incorrect! The correct answer is {}", self.correct_answer)).as_str());
+        }
+
+    }
+}
+
 #[derive(FromRepr, Debug, PartialEq, EnumCount)]
 enum ChordFunction {
     I,
@@ -152,17 +180,14 @@ fn incorrect_output(output: &str) {
 
 
 fn notes_to_italian_test(note: &str) {
-    println!("what is the italian name for: {}", note);
-    let ref mut user_input = read_from_user().expect("failed to read from user");
-
+    let question = format!("what is the italian name for: {}", note);
     let index = get_note_index(note).expect(format!("invalid note, {}", note).as_str());
     let italian = ITALIAN_NOTES[index];
-    if user_input.to_ascii_lowercase().starts_with(&italian.to_ascii_lowercase()) {
-        correct_output(format!("correct! {} is {}", note, italian).as_str());
-    }
-    else {
-        incorrect_output(format!("incorrect! {} is {}", note, italian).as_str());
-    }
+    let mut game = Game {
+        user_answer: None,
+        correct_answer: String::from(italian),
+    };
+    game.play_game(question.as_str());
 }
 
 
@@ -258,12 +283,12 @@ fn choose_game() {
     let ref mut user_input = String::new();
     stdin().read_line(user_input).expect("failed to read input");
     let game = user_input.trim().parse::<u8>().expect(format!("invalid input: '{}'", user_input).as_str());
-    
+
     match game {
         1 => sheet_note_test(),
         2 => circle_of_fifths_test(),
         3 => american_to_italian_notes_test(),
-        4 => chord_function_test(vec![]),
+        4 => chord_function_test(vec![0,1,2,3,4,5,6]),
         5 => chord_function_test(vec![3, 4]),
         _ => println!("invalid game"),
     }
