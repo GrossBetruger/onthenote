@@ -45,6 +45,12 @@ struct Game {
 }
 
 impl Game {
+    fn new(correct_answer: &str) -> Game {
+        Game {
+            user_answer: None,
+            correct_answer: String::from(correct_answer),
+        }
+    }
     fn check_answer(&self) -> bool {
         self.user_answer.clone().expect("user answer doesn't exist").trim().to_lowercase() == self.correct_answer.trim().to_lowercase()
     }
@@ -240,17 +246,14 @@ fn sheet_note_test() {
 }
 
 fn chord_function_test(filter: Vec<usize>) {
-    let rand_usize = random_usize(0, MajorScale::COUNT);
-    let scale: MajorScale = MajorScale::from_repr(rand_usize).unwrap();
+    let scale: MajorScale = MajorScale::from_repr(random_usize(0, MajorScale::COUNT)).unwrap();
     let scale_notes = *scale.get_major_scale();
-    // let random_function = [ChordFunction::I, ChordFunction::II, ChordFunction::III, ChordFunction::IV, ChordFunction::V, ChordFunction::VI, ChordFunction::VII].choose(&mut rand::thread_rng()).unwrap();
     let function_index = random_usize(0, ChordFunction::COUNT);
     if !filter.contains(&function_index) {
         return chord_function_test(filter);
     }
     let root = scale_notes.get(function_index).expect("failed to get root note");
     let function = ChordFunction::from_repr(function_index).expect("failed to get chord function");
-
     let chord_type = match function {
         ChordFunction::I => { "maj7" },
         ChordFunction::II => { "m7" },
@@ -260,16 +263,9 @@ fn chord_function_test(filter: Vec<usize>) {
         ChordFunction::VI => { "m7" },
         ChordFunction::VII => { "m7b5" },
     };
+    let mut game = Game::new(&format!("{}{}", root, chord_type));
+    game.play_game(format!("what is the {:?} chord of major scale: {:?}", function, scale).as_str());
 
-    let chord = format!("{}{}", root, chord_type);
-    println!("what is the {:?} chord of major scale: {:?}", function, scale);
-
-    let answer = read_from_user().expect("failed to read from user");
-    if answer.trim().to_ascii_lowercase() == chord.to_ascii_lowercase() {
-        correct_output("correct!");
-    } else {
-        incorrect_output(format!("incorrect! chord was {}", chord).as_str());
-    }
 }
 
 
@@ -279,7 +275,7 @@ fn choose_game() {
     println!("2. circle of fifths");
     println!("3. american to italian notes");
     println!("4. chord function");
-    println!("5. chord function IV V");
+    println!("5. chord function (IV, V)");
     println!();
     let ref mut user_input = String::new();
     stdin().read_line(user_input).expect("failed to read input");
