@@ -1,9 +1,11 @@
 use std::fmt::format;
 use std::io::stdin;
+use std::thread::park_timeout;
 use rand::distributions::uniform::SampleRange;
 use rand::seq::SliceRandom;
 use strum::EnumCount;
 use strum_macros::{EnumCount, FromRepr};
+use regex::Regex;
 
 mod constants;
 use constants::G_ASCII;
@@ -39,6 +41,7 @@ const MINOR_SCALE_INTERVALS: [u8; 7] = [2, 1, 2, 2, 1, 2, 2];
 const MAJOR_SCALE_SHARPS: [&'static str; 7] = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"];
 const MAJOR_SCALE_FLATS: [&'static str; 7] = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"];
 
+#[derive(Debug)]
 struct Game {
     user_answer: Option<String>,
     correct_answer: String,
@@ -245,12 +248,12 @@ fn sheet_note_test() {
     }
 }
 
-fn chord_function_test(filter: Vec<usize>) {
+fn chord_function_test(filter: Vec<usize>, no_interaction: bool) -> Game {
     let scale: MajorScale = MajorScale::from_repr(random_usize(0, MajorScale::COUNT)).unwrap();
     let scale_notes = *scale.get_major_scale();
     let function_index = random_usize(0, ChordFunction::COUNT);
     if !filter.contains(&function_index) {
-        return chord_function_test(filter);
+        return chord_function_test(filter, no_interaction);
     }
     let root = scale_notes.get(function_index).expect("failed to get root note");
     let function = ChordFunction::from_repr(function_index).expect("failed to get chord function");
@@ -264,8 +267,11 @@ fn chord_function_test(filter: Vec<usize>) {
         ChordFunction::VII => { "m7b5" },
     };
     let mut game = Game::new(&format!("{}{}", root, chord_type));
+    if no_interaction {
+        return game;
+    }
     game.play_game(format!("what is the {:?} chord of major scale: {:?}", function, scale).as_str());
-
+    game
 }
 
 
@@ -275,7 +281,7 @@ fn choose_game() {
     println!("2. circle of fifths");
     println!("3. american to italian notes");
     println!("4. chord function");
-    println!("5. chord function (IV, V)");
+    println!("5. chord function (II, V)");
     println!();
     let ref mut user_input = String::new();
     stdin().read_line(user_input).expect("failed to read input");
@@ -285,8 +291,8 @@ fn choose_game() {
         1 => sheet_note_test(),
         2 => circle_of_fifths_test(),
         3 => american_to_italian_notes_test(),
-        4 => chord_function_test(vec![0,1,2,3,4,5,6]),
-        5 => chord_function_test(vec![3, 4]),
+        4 => {chord_function_test(vec![0,1,2,3,4,5,6], false); None.unwrap()},
+        5 => {chord_function_test(vec![1, 4], false); None.unwrap()},
         _ => println!("invalid game"),
     }
 }
@@ -341,4 +347,46 @@ fn test_notes_to_italian3() {
         correct_answer: String::from("sol"),
     };
     assert_eq!(game.check_answer(), true);
+}
+
+#[test]
+fn test_chord_function_game_1() {
+    let mut game = chord_function_test(vec![0], true);
+    let pattern = Regex::new(r"[A-Gb#]maj7").unwrap();
+    assert!(pattern.is_match(&game.correct_answer), "correct answer '{}' doesn't match pattern", game.correct_answer);
+}
+
+#[test]
+fn test_chord_function_game_2 () {
+    let mut game = chord_function_test(vec![1], true);
+    let pattern = Regex::new(r"[A-Gb#]m7").unwrap();
+    assert!(pattern.is_match(&game.correct_answer), "correct answer '{}' doesn't match pattern", game.correct_answer);
+}
+
+#[test]
+fn test_chord_function_game_3 () {
+    let mut game = chord_function_test(vec![2], true);
+    let pattern = Regex::new(r"[A-Gb#]m7").unwrap();
+    assert!(pattern.is_match(&game.correct_answer), "correct answer '{}' doesn't match pattern", game.correct_answer);
+}
+
+#[test]
+fn test_chord_function_game_4 () {
+    let mut game = chord_function_test(vec![3], true);
+    let pattern = Regex::new(r"[A-Gb#]maj7").unwrap();
+    assert!(pattern.is_match(&game.correct_answer), "correct answer '{}' doesn't match pattern", game.correct_answer);
+}
+
+#[test]
+fn test_chord_function_game_5 () {
+    let mut game = chord_function_test(vec![4], true);
+    let pattern = Regex::new(r"[A-Gb#]7").unwrap();
+    assert!(pattern.is_match(&game.correct_answer), "correct answer '{}' doesn't match pattern", game.correct_answer);
+}
+
+#[test]
+fn test_chord_function_game_6 () {
+    let mut game = chord_function_test(vec![5], true);
+    let pattern = Regex::new(r"[A-Gb#]m7").unwrap();
+    assert!(pattern.is_match(&game.correct_answer), "correct answer '{}' doesn't match pattern", game.correct_answer);
 }
