@@ -1,4 +1,4 @@
-use std::fmt::format;
+// use std::fmt::format;
 use std::io::stdin;
 use std::thread::park_timeout;
 use rand::distributions::uniform::SampleRange;
