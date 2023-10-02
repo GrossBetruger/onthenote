@@ -291,8 +291,8 @@ fn choose_game() {
         1 => sheet_note_test(),
         2 => circle_of_fifths_test(),
         3 => american_to_italian_notes_test(),
-        4 => {chord_function_test(vec![0,1,2,3,4,5,6], false); None.unwrap()},
-        5 => {chord_function_test(vec![1, 4], false); None.unwrap()},
+        4 => {chord_function_test(vec![0,1,2,3,4,5,6], false);},
+        5 => {chord_function_test(vec![1, 4], false);},
         _ => println!("invalid game"),
     }
 }
