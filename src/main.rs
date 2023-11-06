@@ -235,17 +235,15 @@ fn american_to_italian_notes_test() {
 }
 
 
-fn sheet_note_test() {
+fn sheet_note_test(no_interaction: bool ) -> Game {
     let rand_usize = random_usize(0, MajorScale::COUNT);
     let note: Note = Note::from_repr(rand_usize).unwrap();
-    print!("what note is this? {}\n", note.get_ascii_art());
-    let answer = read_from_user().expect("failed to read from user");
-    if Note::code_to_note(&answer.trim().to_uppercase()) == note {
-        correct_output("correct!");
+    let mut game = Game::new(&format!("{:?}", note));
+    if no_interaction {
+        return game;
     }
-    else {
-        incorrect_output(format!("incorrect! note was {}", note.note_to_code()).as_str());
-    }
+    game.play_game(&format!("what note is this? {}\n", note.get_ascii_art()));
+    game
 }
 
 fn chord_function_test(filter: Vec<usize>, no_interaction: bool) -> Game {
@@ -288,7 +286,7 @@ fn choose_game() {
     let game = user_input.trim().parse::<u8>().expect(format!("invalid input: '{}'", user_input).as_str());
 
     match game {
-        1 => sheet_note_test(),
+        1 => {sheet_note_test(false);},
         2 => circle_of_fifths_test(),
         3 => american_to_italian_notes_test(),
         4 => {chord_function_test(vec![0,1,2,3,4,5,6], false);},
